@@ -48,20 +48,18 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
 {
   xVectorPointThree = segmentLength * cos(radians(-(float)angle));
   yVectorPointThree = segmentLength * sin(radians(-(float)angle));
-  
-  if (mouseXPosition <= xOrigin){
-    mouseXPosition = xOrigin;
-  }
-  else if(mouseYPosition >= yOrigin){
-    mouseYPosition = yOrigin;
-  }
+
+  //if (mouseY > yOrigin && angle < 0){
+  //    mouseYPosition = yOrigin;
+  //  }
+    
   if (mouseXPosition <= xOrigin + (int)round(xVectorPointThree) && mouseYPosition <= yOrigin + (int)round(yVectorPointThree)){
     mouseXPosition = xOrigin + (int)round(xVectorPointThree) ;
     pointTwoXPosition = xOrigin;
     pointTwoYPosition = (float)mouseYPosition - yVectorPointThree;
   }
   else if (mouseXPosition >= xOrigin + (int)round(xVectorPointThree) && mouseYPosition >= yOrigin + (int)round(yVectorPointThree)){
-    mouseYPosition = yOrigin + (int)round(yVectorPointThree);
+      mouseYPosition = yOrigin + (int)round(yVectorPointThree);
     pointTwoXPosition = (float)mouseXPosition - xVectorPointThree;
     pointTwoYPosition = yOrigin;
   }
@@ -116,6 +114,9 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
   thetaOneLocal = (int)(thetaZeroGlobal - (float)thetaOneGlobal);
   thetaTwoLocal = angle + (int)round(thetaOneGlobal);
     
+  println(xThree);
+  println(yThree);
+  
   //output
   float[] output = { thetaZeroLocal, thetaOneLocal, thetaTwoLocal, xThree, yThree};
   return output;
@@ -124,6 +125,9 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
 void mouseWheel(MouseEvent event){
   i = event.getCount();
   angle = angle + i;
+  if (angle >= 90){
+    angle = 90;
+  }
 }
 
 void dashboard(){
