@@ -6,7 +6,7 @@ int xOrigin = origin[0];
 int yOrigin = origin[1]; 
 float pointTwoXPosition, pointTwoYPosition;
 int angle;
-float vectorPointTwoX, vectorPointTwoY, vectorPointThreeX, vectorPointThreeY;
+float vectorPointTwoX, vectorPointTwoY, xVectorPointThree, yVectorPointThree;
 
 float thetaZeroGlobal, thetaOneGlobal, thetaTwoGlobal;
 int thetaZeroLocal, thetaOneLocal, thetaTwoLocal;
@@ -46,22 +46,35 @@ void drawArm(){
 
 float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int angle)
 {
-  vectorPointThreeX = segmentLength * cos(radians(-(float)angle));
-  vectorPointThreeY = segmentLength * sin(radians(-(float)angle));
-  pointTwoXPosition = (float)mouseXPosition - vectorPointThreeX;
-  pointTwoYPosition = (float)mouseYPosition - vectorPointThreeY;
+  xVectorPointThree = segmentLength * cos(radians(-(float)angle));
+  yVectorPointThree = segmentLength * sin(radians(-(float)angle));
   
-  println(vectorPointThreeX);
-  
-  
-  if (mouseXPosition <= xOrigin+(int)round(vectorPointThreeX)  ){
-    mouseXPosition = xOrigin+(int)round(vectorPointThreeX) ;
+  if (mouseXPosition <= xOrigin){
+    mouseXPosition = xOrigin;
   }
-  else if (mouseYPosition >= yOrigin){
+  else if(mouseYPosition >= yOrigin){
     mouseYPosition = yOrigin;
   }
-  println(mouseXPosition);
-
+  if (mouseXPosition <= xOrigin + (int)round(xVectorPointThree) && mouseYPosition <= yOrigin + (int)round(yVectorPointThree)){
+    mouseXPosition = xOrigin + (int)round(xVectorPointThree) ;
+    pointTwoXPosition = xOrigin;
+    pointTwoYPosition = (float)mouseYPosition - yVectorPointThree;
+  }
+  else if (mouseXPosition >= xOrigin + (int)round(xVectorPointThree) && mouseYPosition >= yOrigin + (int)round(yVectorPointThree)){
+    mouseYPosition = yOrigin + (int)round(yVectorPointThree);
+    pointTwoXPosition = (float)mouseXPosition - xVectorPointThree;
+    pointTwoYPosition = yOrigin;
+  }
+  else if(mouseXPosition <= xOrigin + (int)round(xVectorPointThree) && mouseYPosition >= yOrigin + (int)round(yVectorPointThree)){
+    mouseXPosition = xOrigin + (int)round(xVectorPointThree) ;
+    mouseYPosition = yOrigin + (int)round(yVectorPointThree);
+    pointTwoXPosition = xOrigin;
+    pointTwoYPosition = yOrigin;
+  }
+  else{
+    pointTwoXPosition = (float)mouseXPosition - xVectorPointThree;
+    pointTwoYPosition = (float)mouseYPosition - yVectorPointThree;
+  }
     
   float pointTwoXComponent = pointTwoXPosition - xOrigin;
   float pointTwoYComponent = pointTwoYPosition - yOrigin;
@@ -78,8 +91,8 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
       yOne = yOrigin + vectorPointTwoY * segmentLength;
       xTwo = xOrigin + vectorPointTwoX * segmentLength * 2;
       yTwo = yOrigin + vectorPointTwoY * segmentLength * 2;
-      xThree = xTwo + vectorPointThreeX;
-      yThree = yTwo + vectorPointThreeY;     
+      xThree = xTwo + xVectorPointThree;
+      yThree = yTwo + yVectorPointThree;     
   } 
   else 
   {
@@ -102,42 +115,11 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
   thetaOneGlobal = round(degrees(atan((yTwo-yOne)/(xTwo-xOne))));
   thetaOneLocal = (int)(thetaZeroGlobal - (float)thetaOneGlobal);
   thetaTwoLocal = angle + (int)round(thetaOneGlobal);
-  
-
-  
+    
   //output
   float[] output = { thetaZeroLocal, thetaOneLocal, thetaTwoLocal, xThree, yThree};
   return output;
 }
-
-//void limits(){
-//  fill(255,0,0);
-//  strokeWeight(13);
-//  stroke(255, 0, 0);
-//  ellipse(xOrigin, yOrigin, segmentLength-20, segmentLength-20);
-//  fill(0,255,0);
-//  strokeWeight(14);
-//  stroke(0, 255, 0);
-//  arc(xOrigin, yOrigin, segmentLength-20, segmentLength-20, PI+HALF_PI, 2*PI, PIE);
-
-//  fill(255,0,0);
-//  strokeWeight(13);
-//  stroke(255, 0, 0);
-//  ellipse(xOne, yOne, segmentLength-20, segmentLength-20); fill(0, 255, 0);
-//  strokeWeight(14);
-//  stroke(0, 255, 0);
-//  arc(xOne, yOne, segmentLength-20, segmentLength-20, radians(-thetaZeroGlobal),radians(-thetaZeroGlobal+150), PIE);
-  
-//  fill(255,0,0);
-//  strokeWeight(13);
-//  stroke(255, 0, 0);
-//  ellipse(xTwo, yTwo, segmentLength-20, segmentLength-20); fill(0, 255, 0);
-//  strokeWeight(14);
-//  stroke(0, 255, 0);
-//  arc(xTwo, yTwo, segmentLength-20, segmentLength-20, radians(thetaOneGlobal-45),radians(thetaOneGlobal+45), PIE);
-//}
-
-
 
 void mouseWheel(MouseEvent event){
   i = event.getCount();
@@ -159,4 +141,8 @@ void dashboard(){
   text ("angle 2", 300, 190);
   text (thetaTwoLocal , 420, 190);
   text ("degrees" , 500, 190);
+  text ("angle horz.", 300, 220);
+  text (angle , 420, 220);
+  text ("degrees" , 500, 220);
+  
 }
