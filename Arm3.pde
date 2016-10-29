@@ -6,7 +6,8 @@ int xOrigin = origin[0];
 int yOrigin = origin[1]; 
 float pointTwoXPosition, pointTwoYPosition;
 int angle;
-float vectorPointTwoX, vectorPointTwoY, xVectorPointThree, yVectorPointThree;
+float vectorPointTwoX, vectorPointTwoY, vectorPointThreeX, vectorPointThreeY;
+float mouseXPosition, mouseYPosition;
 
 float thetaZeroGlobal, thetaOneGlobal, thetaTwoGlobal;
 int thetaZeroLocal, thetaOneLocal, thetaTwoLocal;
@@ -19,7 +20,7 @@ void setup() {
 
 void draw() {
   background(255);
-  float[] output = calcArm(mouseX, mouseY, 1, angle);  //output[0]= xOne; output[1]= yOne; output[2]= xTwo; output[3]= yTwo;  
+  calcArm();  //output[0]= xOne; output[1]= yOne; output[2]= xTwo; output[3]= yTwo;  
   //limits();
   drawArm();
   dashboard();
@@ -44,35 +45,41 @@ void drawArm(){
   ellipse(xThree, yThree, 20, 20);
 }
 
-float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int angle)
+void calcArm()
 {
-  xVectorPointThree = segmentLength * cos(radians(-(float)angle));
-  yVectorPointThree = segmentLength * sin(radians(-(float)angle));
-
-  //if (mouseY > yOrigin && angle < 0){
-  //    mouseYPosition = yOrigin;
-  //  }
-    
-  if (mouseXPosition <= xOrigin + (int)round(xVectorPointThree) && mouseYPosition <= yOrigin + (int)round(yVectorPointThree)){
-    mouseXPosition = xOrigin + (int)round(xVectorPointThree) ;
-    pointTwoXPosition = xOrigin;
-    pointTwoYPosition = (float)mouseYPosition - yVectorPointThree;
+  vectorPointThreeX = segmentLength * cos(radians(-(float)angle)); //not a scalar!
+  vectorPointThreeY = segmentLength * sin(radians(-(float)angle));
+  
+  pointTwoXPosition = (float)mouseX - vectorPointThreeX;
+  pointTwoYPosition = (float)mouseY - vectorPointThreeY;
+  
+  //if (mouseX < xOrigin){
+  //  mouseX = xOrigin;
+  //}
+  //if (mouseY > yOrigin){
+  //  mouseY = yOrigin;
+  //}
+  
+  
+  if( angle <= 0 && mouseY >= yOrigin){
+    mouseXPosition = mouseX;
+    mouseYPosition = yOrigin;
   }
-  else if (mouseXPosition >= xOrigin + (int)round(xVectorPointThree) && mouseYPosition >= yOrigin + (int)round(yVectorPointThree)){
-      mouseYPosition = yOrigin + (int)round(yVectorPointThree);
-    pointTwoXPosition = (float)mouseXPosition - xVectorPointThree;
-    pointTwoYPosition = yOrigin;
+  else if( angle >= 0 && pointTwoYPosition >= yOrigin){
+    mouseXPosition = mouseX;
+    mouseYPosition = yOrigin - abs(vectorPointThreeY);
   }
-  else if(mouseXPosition <= xOrigin + (int)round(xVectorPointThree) && mouseYPosition >= yOrigin + (int)round(yVectorPointThree)){
-    mouseXPosition = xOrigin + (int)round(xVectorPointThree) ;
-    mouseYPosition = yOrigin + (int)round(yVectorPointThree);
-    pointTwoXPosition = xOrigin;
-    pointTwoYPosition = yOrigin;
+  else if( pointTwoXPosition <= xOrigin){
+    mouseXPosition = xOrigin + abs(vectorPointThreeX);
+    mouseYPosition = mouseY;
   }
-  else{
-    pointTwoXPosition = (float)mouseXPosition - xVectorPointThree;
-    pointTwoYPosition = (float)mouseYPosition - yVectorPointThree;
+  else if (mouseX >= xOrigin && mouseY <= yOrigin && pointTwoYPosition <= yOrigin){
+    mouseXPosition = mouseX;
+    mouseYPosition = mouseY;
   }
+  
+  pointTwoXPosition = (float)mouseXPosition - vectorPointThreeX;
+  pointTwoYPosition = (float)mouseYPosition - vectorPointThreeY;
     
   float pointTwoXComponent = pointTwoXPosition - xOrigin;
   float pointTwoYComponent = pointTwoYPosition - yOrigin;
@@ -89,8 +96,8 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
       yOne = yOrigin + vectorPointTwoY * segmentLength;
       xTwo = xOrigin + vectorPointTwoX * segmentLength * 2;
       yTwo = yOrigin + vectorPointTwoY * segmentLength * 2;
-      xThree = xTwo + xVectorPointThree;
-      yThree = yTwo + yVectorPointThree;     
+      xThree = xTwo + vectorPointThreeX;
+      yThree = yTwo + vectorPointThreeY;     
   } 
   else 
   {
@@ -100,9 +107,8 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
       yTwo = pointTwoYPosition;
       float normalMagnitude = -sqrt(sq(segmentLength)-sq(radiusPointTwo/2));
       
-      if(preferredRotation < 0){
-          normalMagnitude =- normalMagnitude; // Make it a negative number
-      }
+      //normalMagnitude =- normalMagnitude; // Make it a negative number
+      
       xOne -= vectorPointTwoY * normalMagnitude;
       yOne += vectorPointTwoX * normalMagnitude;
       xThree = mouseXPosition;
@@ -117,9 +123,6 @@ float[] calcArm(int mouseXPosition,int mouseYPosition,int preferredRotation, int
   println(xThree);
   println(yThree);
   
-  //output
-  float[] output = { thetaZeroLocal, thetaOneLocal, thetaTwoLocal, xThree, yThree};
-  return output;
 }
 
 void mouseWheel(MouseEvent event){
