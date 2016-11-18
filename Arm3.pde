@@ -20,8 +20,7 @@ void setup() {
 
 void draw() {
   background(255);
-  calcArm();  //output[0]= xOne; output[1]= yOne; output[2]= xTwo; output[3]= yTwo;  
-  //limits();
+  calcArm();
   drawArm();
   dashboard();
 }
@@ -52,14 +51,6 @@ void calcArm()
   
   pointTwoXPosition = (float)mouseX - vectorPointThreeX;
   pointTwoYPosition = (float)mouseY - vectorPointThreeY;
-  
-  //if (mouseX < xOrigin){
-  //  mouseX = xOrigin;
-  //}
-  //if (mouseY > yOrigin){
-  //  mouseY = yOrigin;
-  //}
-  
   
   if( angle <= 0 && mouseY >= yOrigin){
     mouseXPosition = mouseX;
